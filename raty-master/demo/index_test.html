@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<script src="../vendor/jquery.js"></script>
+		<script src="../lib/jquery.raty.js"></script>
+		<script src="javascripts/labs.js" type="text/javascript"></script>
+		<title>
+			<h2>Test Title</h2>
+		</title>
+
+	</head>
+	<body>
+		<div id="star_rating">
+			<h4>Test Star Rating</h4>
+		</div>
+
+
+		<script>
+			$.fn.raty.defaults.path = '../lib/images';
+
+			$('#star_rating').raty({ score: 3 });
+			
+			
+		</script>
+
+	</body>
+</html>

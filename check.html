@@ -1,0 +1,25 @@
+<html>
+ <head>
+ 
+ </head>
+ <body>
+ <script src="lib/d3.v3.min.js" charset="utf-8"></script>
+ <script type="text/javascript">
+d3.csv("check.csv",function(data){
+	map={};
+	var i=0;
+for(var j=0;j<data.length;j++){
+	var instance=data[j].Lat;
+	if(instance in map){
+		console.log(instance);
+	}else{
+		i=i+1;
+		map[instance]=instance;
+	}
+	
+}
+alert(i);
+});
+
+	</script>
+ </body>
